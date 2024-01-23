@@ -1,6 +1,5 @@
 package cn.lucasji.starry.idp.core.config.security;
 
-import cn.lucasji.starry.idp.core.config.cors.CommonCorsConfiguration;
 import cn.lucasji.starry.idp.core.config.jackson2.mixin.RoleMixin;
 import cn.lucasji.starry.idp.core.config.jackson2.mixin.TimestampMixin;
 import cn.lucasji.starry.idp.core.config.jackson2.mixin.UserMixin;
@@ -19,12 +18,18 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
@@ -58,14 +63,6 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.CorsFilter;
 
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.function.Function;
-
 /**
  * @author lucas
  * @date 2023/8/23 20:03
@@ -74,7 +71,6 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Slf4j
-@Import(CommonCorsConfiguration.class)
 public class AuthorizationServerConfiguration {
 
   private final String LOGIN_URL = "http://localhost:3000/auth/signin";
@@ -87,74 +83,84 @@ public class AuthorizationServerConfiguration {
   @Order(Ordered.HIGHEST_PRECEDENCE)
   public SecurityFilterChain authServerSecurityFilterChain(HttpSecurity http) throws Exception {
     OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
-      new OAuth2AuthorizationServerConfigurer();
+        new OAuth2AuthorizationServerConfigurer();
     RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
 
-    Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper =
-      context -> {
-        OidcUserInfoAuthenticationToken authentication = context.getAuthentication();
-        JwtAuthenticationToken principal = (JwtAuthenticationToken) authentication.getPrincipal();
-
-        log.info("===OidcUserInfo: {}===", authentication.getUserInfo());
-        log.info("===JwtAuthenticationToken: {}===", principal);
-
-        return new OidcUserInfo(principal.getToken().getClaims());
-      };
-    // 开启OpenID Connect 1.0协议相关端点
-    // 自定义oidc用户信息
-    authorizationServerConfigurer.oidc(
-      oidc -> oidc.userInfoEndpoint(userInfo -> userInfo.userInfoMapper(userInfoMapper)));
-
     http.securityMatcher(endpointsMatcher)
-      .securityContext(
-        context -> context.securityContextRepository(redisSecurityContextRepository))
-      .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-      // 忽略认证端点的csrf校验
-      .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
-      // 未登录访问认证端点时重定向至login页面
-      .exceptionHandling(
-        exceptions ->
-          exceptions.defaultAuthenticationEntryPointFor(
-            new LoginTargetAuthenticationEntryPoint(LOGIN_URL),
-            new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
-      // 处理使用access token访问用户信息端点和客户端注册端点
-      .oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()))
-      .apply(authorizationServerConfigurer);
+        .securityContext(
+            context -> context.securityContextRepository(redisSecurityContextRepository))
+        .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+        // 忽略认证端点的csrf校验
+        .csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
+        // 未登录访问认证端点时重定向至login页面
+        .exceptionHandling(
+            exceptions ->
+                exceptions.defaultAuthenticationEntryPointFor(
+                    new LoginTargetAuthenticationEntryPoint(LOGIN_URL),
+                    new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
+        // 处理使用access token访问用户信息端点和客户端注册端点
+        .oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()))
+        // 开启OpenID Connect 1.0协议相关端点
+        .with(
+            authorizationServerConfigurer,
+            configurer ->
+                // 自定义oidc用户信息
+                configurer.oidc(
+                    oidc ->
+                        oidc.userInfoEndpoint(
+                            userInfo -> userInfo.userInfoMapper(getUserInfoMapper()))));
 
     return http.build();
   }
 
+  /**
+   * 将 jwt 中的用户信息映射为 oidc user
+   *
+   * @return OidcUserInfoAuthenticationContext -> OidcUserInfo
+   */
+  Function<OidcUserInfoAuthenticationContext, OidcUserInfo> getUserInfoMapper() {
+    return context -> {
+      OidcUserInfoAuthenticationToken authentication = context.getAuthentication();
+      JwtAuthenticationToken principal = (JwtAuthenticationToken) authentication.getPrincipal();
+
+      log.info("===OidcUserInfo: {}===", authentication.getUserInfo());
+      log.info("===JwtAuthenticationToken: {}===", principal);
+
+      return new OidcUserInfo(principal.getToken().getClaims());
+    };
+  }
+
   @Bean
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, CorsFilter corsFilter)
-    throws Exception {
+      throws Exception {
     http.addFilter(corsFilter)
-      .csrf(AbstractHttpConfigurer::disable)
-      .authorizeHttpRequests(
-        authorize ->
-          authorize
-            .requestMatchers("/actuator/**", "/actuator")
-            .permitAll()
-            .anyRequest()
-            .authenticated())
-      // 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
-      .oauth2ResourceServer(
-        configurer ->
-          configurer
-            .jwt(Customizer.withDefaults())
-            .accessDeniedHandler(SecurityUtils::exceptionHandler)
-            .authenticationEntryPoint(SecurityUtils::exceptionHandler))
-      // 开启登录页面
-      .formLogin(
-        formLogin -> {
-          formLogin.loginPage("/login");
-          if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
-            formLogin // 登录成功和失败改为写回json,不重定向了
-              .successHandler(new LoginSuccessHandler())
-              .failureHandler(new LoginFailureHandler());
-          }
-        })
-      .securityContext(
-        context -> context.securityContextRepository(redisSecurityContextRepository));
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(
+            authorize ->
+                authorize
+                    .requestMatchers("/actuator/**", "/actuator")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        // 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
+        .oauth2ResourceServer(
+            configurer ->
+                configurer
+                    .jwt(Customizer.withDefaults())
+                    .accessDeniedHandler(SecurityUtils::exceptionHandler)
+                    .authenticationEntryPoint(SecurityUtils::exceptionHandler))
+        // 开启登录页面
+        .formLogin(
+            formLogin -> {
+              formLogin.loginPage("/login");
+              if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
+                formLogin // 登录成功和失败改为写回json,不重定向了
+                    .successHandler(new LoginSuccessHandler())
+                    .failureHandler(new LoginFailureHandler());
+              }
+            })
+        .securityContext(
+            context -> context.securityContextRepository(redisSecurityContextRepository));
     return http.build();
   }
 
@@ -171,7 +177,7 @@ public class AuthorizationServerConfiguration {
   @Bean
   public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
     JdbcRegisteredClientRepository registeredClientRepository =
-      new JdbcRegisteredClientRepository(jdbcTemplate);
+        new JdbcRegisteredClientRepository(jdbcTemplate);
 
     // 初始化/更新clients
     for (BuildInRegisteredClients client : BuildInRegisteredClients.values()) {
@@ -183,11 +189,11 @@ public class AuthorizationServerConfiguration {
 
   @Bean
   public OAuth2AuthorizationService oAuth2AuthorizationService(
-    JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+      JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
     JdbcOAuth2AuthorizationService service =
-      new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+        new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
     JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper rowMapper =
-      new JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper(registeredClientRepository);
+        new JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper(registeredClientRepository);
     ObjectMapper objectMapper = new ObjectMapper();
     ClassLoader classLoader = JdbcOAuth2AuthorizationService.class.getClassLoader();
     List<Module> securityModules = SecurityJackson2Modules.getModules(classLoader);
@@ -205,7 +211,7 @@ public class AuthorizationServerConfiguration {
 
   @Bean
   public OAuth2AuthorizationConsentService authorizationConsentService(
-    JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
+      JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
     return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
   }
 

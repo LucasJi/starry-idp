@@ -59,7 +59,7 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
       .orElseThrow(() -> new NoSuchElementException("Could not find user with id " + id));
   }
 
-  public Map<Long, User> getIdUserMapByIds(List<Long> ids) {
+  public Map<Long, User> findIdUserMapByIds(List<Long> ids) {
     List<User> users = userRepository.findAllByIdIn(ids);
     return users.stream().collect(Collectors.toMap(BaseEntity::getId, user -> user));
   }
@@ -70,7 +70,7 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
     return userPage;
   }
 
-  public Result<User> addUser(User user) {
+  public Result<User> add(User user) {
     log.info("新增用户:{}", user);
 
     if (userRepository.existsByEmail(user.getEmail())) {
@@ -82,7 +82,7 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
     return Result.success(added);
   }
 
-  public Result<String> updateUser(User user) {
+  public Result<String> edit(User user) {
     log.info("更新用户:{}", user);
     User originalUser = findById(user.getId());
 
@@ -111,7 +111,7 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
     return Result.success();
   }
 
-  public Result<String> deleteUser(Long userId) {
+  public Result<String> delete(Long userId) {
     userRepository.deleteById(userId);
     return Result.success();
   }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +36,7 @@ public class UserController {
 
   @PostMapping("/idUserMap")
   public Map<Long, User> getIdUserMapByUserIds(@RequestBody List<Long> ids) {
-    return userService.getIdUserMapByIds(ids);
+    return userService.findIdUserMapByIds(ids);
   }
 
   @PostMapping("/findPageByUserIdIn")
@@ -43,18 +44,18 @@ public class UserController {
     return userService.findPageByUserIdIn(userIds, pageable);
   }
 
-  @PostMapping("/addUser")
-  public Result<User> addUser(@RequestBody User user) {
-    return userService.addUser(user);
+  @PostMapping
+  public Result<User> add(@RequestBody User user) {
+    return userService.add(user);
   }
 
-  @PostMapping("/updateUser")
-  public Result<String> updateUser(@RequestBody User user) {
-    return userService.updateUser(user);
+  @PatchMapping
+  public Result<String> edit(@RequestBody User user) {
+    return userService.edit(user);
   }
 
-  @DeleteMapping("/deleteUser/{id}")
-  public Result<String> deleteUser(@PathVariable Long id) {
-    return userService.deleteUser(id);
+  @DeleteMapping("/{id}")
+  public Result<String> delete(@PathVariable Long id) {
+    return userService.delete(id);
   }
 }

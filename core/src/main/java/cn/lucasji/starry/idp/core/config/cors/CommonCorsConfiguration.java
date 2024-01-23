@@ -1,6 +1,7 @@
 package cn.lucasji.starry.idp.core.config.cors;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -9,6 +10,7 @@ import org.springframework.web.filter.CorsFilter;
  * @author lucas
  * @date 2023/12/5 10:38
  */
+@Configuration
 public class CommonCorsConfiguration {
 
   /**
