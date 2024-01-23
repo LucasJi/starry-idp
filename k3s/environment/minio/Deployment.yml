@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-deploy
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: minio-pvc
+      containers:
+        - name: minio
+          image: quay.io/minio/minio:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - server
+            - /storage
+            - '--address'
+            - ':9202' # api地址
+            - '--console-address'
+            - ':9201' # 控制台地址
+          env:
+            - name: MINIO_ROOT_USER
+              value: minio
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: password
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: accessKey
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: secretKey
+            - name: MINIO_BROWSER_REDIRECT_URL
+              value: http://49.234.53.94:30201
+            - name: MINIO_SERVER_URL
+              value: http://49.234.53.94:30202
+          ports:
+            - containerPort: 9202
+            - containerPort: 9201
+          volumeMounts:
+            - name: storage # 必须和上面定义的volume名字保持一致
+              mountPath: "/storage"
+      nodeSelector:
+        kubernetes.io/hostname: k3s-master
+

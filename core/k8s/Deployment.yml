@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starry-idp-deploy
+  labels:
+    app: starry-idp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: starry-idp
+  template:
+    metadata:
+      labels:
+        app: starry-idp
+    spec:
+      containers:
+        - name: starry-idp
+          image: registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp:latest
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                # 创建postgres服务时生成
+                secretKeyRef:
+                  name: db-secret
+                  key: password
+            - name: SPRING_DATA_REDIS_PASSWORD
+              valueFrom:
+                # 创建redis集群时生成
+                secretKeyRef:
+                  name: my-redis-secret
+                  key: password
+          ports:
+            - containerPort: 8080
+              name: server

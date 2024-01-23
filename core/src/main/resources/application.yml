@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: idp
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+jwk:
+  jks-file-path: starry.jks
+  alias: starry
+  pass: starry
+user:
+  timezone: Asia/Shanghai

@@ -1,0 +1,11 @@
+auth:
+  enable: true
+  password: # password
+master:
+  persistence:
+    size: 4Gi
+replica:
+  persistence:
+    size: 4Gi
+global:
+  storageClass: local-path

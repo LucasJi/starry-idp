@@ -1,0 +1,147 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: lucas
+      comment: oauth2-authorization-consent-schema
+      changes:
+        - sqlFile:
+            dbms: 'postgresql'
+            path: db/sql/oauth2-authorization-consent-schema.sql
+  - changeSet:
+      id: 2
+      author: lucas
+      comment: oauth2-registered-client-schema
+      changes:
+        - sqlFile:
+            dbms: 'postgresql'
+            path: db/sql/oauth2-registered-client-schema.sql
+  - changeSet:
+      id: 3
+      author: lucas
+      comment: oauth2-authorization-schema
+      changes:
+        - sqlFile:
+            dbms: 'postgresql'
+            path: db/sql/oauth2-authorization-schema.sql
+  - changeSet:
+      id: 4
+      author: lucas
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: username
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: creation_timestamp
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: update_timestamp
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 5
+      author: lucas
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(128)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: creation_timestamp
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: update_timestamp
+                  type: timestamp
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 6
+      author: lucas
+      changes:
+        - loadData:
+            schemaName: public
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  header: name
+                  type: varchar(128)
+            encoding: UTF-8
+            file: db/data/administrator_role.csv
+  - changeSet:
+      id: 7
+      author: lucas
+      changes:
+        - loadData:
+            schemaName: public
+            tableName: user
+            columns:
+              - column:
+                  name: username
+                  header: username
+                  type: varchar(128)
+              - column:
+                  name: email
+                  header: email
+                  type: varchar(128)
+              - column:
+                  name: password
+                  header: password
+                  type: varchar(64)
+              - column:
+                  name: role_id
+                  header: role_id
+                  type: bigint
+            encoding: UTF-8
+            file: db/data/administrator.csv
