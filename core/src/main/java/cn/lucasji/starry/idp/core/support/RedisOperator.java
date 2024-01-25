@@ -2,6 +2,11 @@ package cn.lucasji.starry.idp.core.support;
 
 import cn.lucas.starry.infrastructure.util.JsonUtils;
 import jakarta.annotation.Resource;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
@@ -9,34 +14,28 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author lucas
  * @date 2023/11/7 21:16
  */
 @Component
+@RequiredArgsConstructor
 public class RedisOperator<V> {
 
   /**
    * 这里使用 @Resource 注解是因为在配置文件中注入ioc的泛型是<Object, Object>，所以类型匹配不上，
    * resource是会先根据名字去匹配的，所以使用Resource注解可以成功注入
    */
-  @Resource
-  private RedisTemplate<String, V> redisTemplate;
+  @Resource private RedisTemplate<String, V> redisTemplate;
 
-  @Resource
-  private RedisTemplate<String, Object> redisHashTemplate;
+  @Resource private RedisTemplate<String, Object> redisHashTemplate;
 
   /**
    * 设置key的过期时间
    *
-   * @param key     缓存key
+   * @param key 缓存key
    * @param timeout 存活时间
-   * @param unit    时间单位
+   * @param unit 时间单位
    */
   public void setExpire(String key, long timeout, TimeUnit unit) {
     redisHashTemplate.expire(key, timeout, unit);
@@ -58,7 +57,7 @@ public class RedisOperator<V> {
   /**
    * 存入值
    *
-   * @param key   缓存中的key
+   * @param key 缓存中的key
    * @param value 存入的value
    */
   public void set(String key, V value) {
@@ -78,10 +77,10 @@ public class RedisOperator<V> {
   /**
    * 设置键值并设置过期时间
    *
-   * @param key     键
-   * @param value   值
+   * @param key 键
+   * @param value 值
    * @param timeout 过期时间
-   * @param unit    过期时间的单位
+   * @param unit 过期时间的单位
    */
   public void set(String key, V value, long timeout, TimeUnit unit) {
     valueOperations().set(key, value, timeout, unit);
@@ -90,8 +89,8 @@ public class RedisOperator<V> {
   /**
    * 设置键值并设置过期时间（单位秒）
    *
-   * @param key     键
-   * @param value   值
+   * @param key 键
+   * @param value 值
    * @param timeout 过期时间,单位：秒
    */
   public void set(String key, V value, long timeout) {
@@ -116,7 +115,7 @@ public class RedisOperator<V> {
   /**
    * 往hash类型的数据中存值
    *
-   * @param key   缓存中的key
+   * @param key 缓存中的key
    * @param field hash结构的key
    * @param value 存入的value
    */
@@ -137,25 +136,24 @@ public class RedisOperator<V> {
   /**
    * 以hash格式存入redis
    *
-   * @param key   缓存中的key
+   * @param key 缓存中的key
    * @param value 存入的对象
    */
   public void setHashAll(String key, Object value) {
     Map<String, Object> map =
-      JsonUtils.objectCovertToObject(value, Map.class, String.class, Object.class);
+        JsonUtils.objectCovertToObject(value, Map.class, String.class, Object.class);
     hashOperations().putAll(key, map);
   }
 
   /**
    * 设置键值并设置过期时间
    *
-   * @param key     键
-   * @param value   值
+   * @param key 键
+   * @param value 值
    * @param timeout 过期时间
-   * @param unit    过期时间的单位
+   * @param unit 过期时间的单位
    */
-  public void setHashAll(
-    String key, Object value, long timeout, TimeUnit unit) {
+  public void setHashAll(String key, Object value, long timeout, TimeUnit unit) {
     setHashAll(key, value);
     setExpire(key, timeout, unit);
   }
@@ -163,8 +161,8 @@ public class RedisOperator<V> {
   /**
    * 设置键值并设置过期时间（单位秒）
    *
-   * @param key     键
-   * @param value   值
+   * @param key 键
+   * @param value 值
    * @param timeout 过期时间,单位：秒
    */
   public void setHashAll(String key, Object value, long timeout) {
@@ -184,9 +182,9 @@ public class RedisOperator<V> {
   /**
    * 根据指定clazz类型从redis中获取对应的实例
    *
-   * @param key   缓存key
+   * @param key 缓存key
    * @param clazz hash对应java类的class
-   * @param <T>   redis中hash对应的java类型
+   * @param <T> redis中hash对应的java类型
    * @return clazz实例
    */
   public <T> T getHashAll(String key, Class<T> clazz) {
@@ -200,7 +198,7 @@ public class RedisOperator<V> {
   /**
    * 根据key删除缓存
    *
-   * @param key    要删除的key
+   * @param key 要删除的key
    * @param fields key对应的hash数据的键值(HashKey)，可变参数列表
    * @return hash删除的属性数量
    */
@@ -214,7 +212,7 @@ public class RedisOperator<V> {
   /**
    * 将value添加至key对应的列表中
    *
-   * @param key   缓存key
+   * @param key 缓存key
    * @param value 值
    */
   public void listPush(String key, V value) {
@@ -224,10 +222,10 @@ public class RedisOperator<V> {
   /**
    * 将value添加至key对应的列表中，并添加过期时间
    *
-   * @param key     缓存key
-   * @param value   值
+   * @param key 缓存key
+   * @param value 值
    * @param timeout key的存活时间
-   * @param unit    时间单位
+   * @param unit 时间单位
    */
   public void listPush(String key, V value, long timeout, TimeUnit unit) {
     listOperations().rightPush(key, value);
@@ -237,8 +235,8 @@ public class RedisOperator<V> {
   /**
    * 将value添加至key对应的列表中，并添加过期时间 默认单位是秒(s)
    *
-   * @param key     缓存key
-   * @param value   值
+   * @param key 缓存key
+   * @param value 值
    * @param timeout key的存活时间
    */
   public void listPush(String key, V value, long timeout) {
@@ -248,7 +246,7 @@ public class RedisOperator<V> {
   /**
    * 将传入的参数列表添加至key的列表中
    *
-   * @param key    缓存key
+   * @param key 缓存key
    * @param values 值列表
    * @return 存入数据的长度
    */
@@ -259,14 +257,13 @@ public class RedisOperator<V> {
   /**
    * 将传入的参数列表添加至key的列表中，并设置key的存活时间
    *
-   * @param key     缓存key
-   * @param values  值列表
+   * @param key 缓存key
+   * @param values 值列表
    * @param timeout key的存活时间
-   * @param unit    时间单位
+   * @param unit 时间单位
    * @return 存入数据的长度
    */
-  public Long listPushAll(
-    String key, Collection<V> values, long timeout, TimeUnit unit) {
+  public Long listPushAll(String key, Collection<V> values, long timeout, TimeUnit unit) {
     Long count = listOperations().rightPushAll(key, values);
     setExpire(key, timeout, unit);
     return count;
@@ -275,8 +272,8 @@ public class RedisOperator<V> {
   /**
    * 将传入的参数列表添加至key的列表中，并设置key的存活时间 默认单位是秒(s)
    *
-   * @param key     缓存key
-   * @param values  值列表
+   * @param key 缓存key
+   * @param values 值列表
    * @param timeout key的存活时间
    * @return 存入数据的长度
    */

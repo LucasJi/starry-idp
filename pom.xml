@@ -28,6 +28,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring-cloud.version>2023.0.0</spring-cloud.version>
     <starry.infrastructure.version>0.0.1-SNAPSHOT</starry.infrastructure.version>
+    <redisson.version>3.23.1</redisson.version>
   </properties>
 
   <dependencyManagement>
@@ -44,6 +45,12 @@
         <groupId>cn.lucas.starry</groupId>
         <artifactId>infrastructure</artifactId>
         <version>${starry.infrastructure.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.redisson</groupId>
+        <artifactId>redisson-spring-boot-starter</artifactId>
+        <version>${redisson.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

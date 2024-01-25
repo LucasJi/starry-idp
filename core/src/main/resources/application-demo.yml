@@ -1,6 +1,11 @@
 server:
   port: 8000
 spring:
+  data:
+    redis:
+      host: # host
+      port: # port
+      password: # password
   redisson:
     file: classpath:redisson-local.yml
   datasource:
