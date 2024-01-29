@@ -1,12 +1,11 @@
-# Starry
+# Starry IDP
 
-## Introduction
+Starry系统下各个应用之间统一身份认证和授权平台
 
-Starry
+## 模块 - core
 
-## Install postgres using docker
+IDP的功能实现模块
 
-```shell
-docker pull postgres
-docker run --name postgresql -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -v /data:/root/data/postgresql -d postgres
-```
+## 模块 - infrastructure
+
+IDP的api模块，方便其余系统集成

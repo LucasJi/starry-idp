@@ -28,6 +28,7 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -50,6 +51,7 @@ import org.springframework.security.oauth2.server.authorization.JdbcOAuth2Author
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
@@ -73,11 +75,14 @@ import org.springframework.web.filter.CorsFilter;
 @Slf4j
 public class AuthorizationServerConfiguration {
 
-  private final String LOGIN_URL = "http://localhost:3000/auth/signin";
+  @Value("${idp.login-url}")
+  private String loginUrl;
 
   private final JwkProperties jwkProperties;
 
   private final RedisSecurityContextRepository redisSecurityContextRepository;
+
+  private final BuildInRegisteredClients buildInRegisteredClients;
 
   @Bean
   @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -96,7 +101,7 @@ public class AuthorizationServerConfiguration {
         .exceptionHandling(
             exceptions ->
                 exceptions.defaultAuthenticationEntryPointFor(
-                    new LoginTargetAuthenticationEntryPoint(LOGIN_URL),
+                    new LoginTargetAuthenticationEntryPoint(loginUrl),
                     new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
         // 处理使用access token访问用户信息端点和客户端注册端点
         .oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()))
@@ -152,7 +157,7 @@ public class AuthorizationServerConfiguration {
         .formLogin(
             formLogin -> {
               formLogin.loginPage("/login");
-              if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
+              if (UrlUtils.isAbsoluteUrl(loginUrl)) {
                 formLogin // 登录成功和失败改为写回json,不重定向了
                     .successHandler(new LoginSuccessHandler())
                     .failureHandler(new LoginFailureHandler());
@@ -179,8 +184,8 @@ public class AuthorizationServerConfiguration {
         new JdbcRegisteredClientRepository(jdbcTemplate);
 
     // 初始化/更新clients
-    for (BuildInRegisteredClients client : BuildInRegisteredClients.values()) {
-      registeredClientRepository.save(client.getRegisteredClient());
+    for (RegisteredClient client : buildInRegisteredClients.getBuildInClients()) {
+      registeredClientRepository.save(client);
     }
 
     return registeredClientRepository;

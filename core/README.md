@@ -20,8 +20,8 @@ Example: `keytool -export -alias starry -keystore starry.jks -file pub.cer`
 
 ## PROD env variable config
 
-Use k8s secret to store sensitive configs such database password. When deploy the application
-to the prod environment, k8s will read the config from the secret and pass it to the
+Use k8s secret to store sensitive configs such as database password. When deploying the application
+to the prod environment, k8s reads the config from the secret and pass it to the
 Dockerfile as arguments through Development.yml.
 
 The entire path:  

@@ -26,3 +26,9 @@ management:
     web:
       exposure:
         include: '*'
+idp:
+  login-url: http://localhost:3000/auth/signin
+  registered-client:
+    starry-edu:
+      redirect-url: http://localhost:3000/api/auth/callback/starry
+      client-secret: $2a$10$.B57Cqa6gIszwQx.oRY5medUUOCJGNupi6z3DbFrfMYZ4bjhCKWcS

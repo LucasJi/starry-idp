@@ -38,3 +38,5 @@ build/
 ### Project ###
 **/application-local.yml
 **/*-local.yml
+**/pub.cer
+**/starry.jsk
