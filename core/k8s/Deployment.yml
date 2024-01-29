@@ -32,6 +32,13 @@ spec:
                 secretKeyRef:
                   name: my-redis-secret
                   key: password
+          volumeMounts:
+            - mountPath: /config
+              name: starry-idp-config
           ports:
             - containerPort: 8080
               name: server
+      volumes:
+        - name: starry-idp-config
+          configMap:
+            name: starry-idp-config
