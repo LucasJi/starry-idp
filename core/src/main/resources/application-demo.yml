@@ -25,7 +25,7 @@ management:
       exposure:
         include: '*'
 idp:
-  issuer: http://localhost:${server.port}
+  issuer: http://localhost:${server.port}/idp
   login-url: http://localhost:3000/auth/signin
   registered-client:
     starry-edu:
