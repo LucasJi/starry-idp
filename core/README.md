@@ -10,6 +10,8 @@ Example: `keytool -export -alias starry -keystore starry.jks -file pub.cer`
 
 `docker build --platform linux/amd64 --rm -t starry-idp:latest .`
 
+## Push to image registry
+
 ## Run image
 
 `docker run starry-idp -d -p 8000:8080`
