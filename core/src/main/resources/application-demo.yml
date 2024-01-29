@@ -6,8 +6,6 @@ spring:
       host: # host
       port: # port
       password: # password
-  redisson:
-    file: classpath:redisson-local.yml
   datasource:
     username: postgres
     password: # password

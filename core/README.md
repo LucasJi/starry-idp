@@ -12,6 +12,11 @@ Example: `keytool -export -alias starry -keystore starry.jks -file pub.cer`
 
 ## Push to image registry
 
+```shell
+docker tag e5acf7e7b29b registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp:latest
+docker push registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp:latest
+```
+
 ## Run image
 
 `docker run starry-idp -d -p 8000:8080`
@@ -19,6 +24,10 @@ Example: `keytool -export -alias starry -keystore starry.jks -file pub.cer`
 ## K3S pull latest image
 
 `crictl pull registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp:latest`
+
+## k3s delete useless images
+
+`crictl rmi --prune`
 
 ## PROD env variable config
 
