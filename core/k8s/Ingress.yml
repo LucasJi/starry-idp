@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: traefik-dashboard-ingress
-  namespace: kube-system
+  name: idp-ingress
+  namespace: default
 spec:
   ingressClassName: traefik
   rules:
     - host: www.lucasji.cn
-    - http:
+      http:
         paths:
-          - path: /traefik
+          - path: /idp
             pathType: Prefix
             backend:
               service:
-                name: traefik-dashboard
+                name: starry-idp-svc
                 port:
-                  number: 9000
+                  number: 8000
