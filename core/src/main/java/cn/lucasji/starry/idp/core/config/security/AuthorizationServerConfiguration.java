@@ -78,6 +78,9 @@ public class AuthorizationServerConfiguration {
   @Value("${idp.login-url}")
   private String loginUrl;
 
+  @Value("${idp.issuer}")
+  private String idpIssuer;
+
   private final JwkProperties jwkProperties;
 
   private final RedisSecurityContextRepository redisSecurityContextRepository;
@@ -245,6 +248,6 @@ public class AuthorizationServerConfiguration {
 
   @Bean
   public AuthorizationServerSettings authorizationServerSettings() {
-    return AuthorizationServerSettings.builder().build();
+    return AuthorizationServerSettings.builder().issuer(idpIssuer).build();
   }
 }

@@ -93,7 +93,7 @@
                 <argument>--rm</argument>
                 <argument>-t</argument>
                 <argument>
-                  registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp:latest:latest
+                  registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp:latest
                 </argument>
                 <argument>.</argument>
               </arguments>
