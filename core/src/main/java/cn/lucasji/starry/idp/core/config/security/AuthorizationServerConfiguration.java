@@ -109,12 +109,11 @@ public class AuthorizationServerConfiguration {
                     oidc ->
                         oidc.userInfoEndpoint(
                             userInfo -> userInfo.userInfoMapper(getUserInfoMapper()))));
-
     return http.build();
   }
 
   /**
-   * 将 jwt 中的用户信息映射为 oidc user
+   * 将 jwt 中的用户信息映射为 oidc user 对象
    *
    * @return OidcUserInfoAuthenticationContext -> OidcUserInfo
    */
