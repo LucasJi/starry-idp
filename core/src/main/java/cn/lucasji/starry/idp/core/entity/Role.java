@@ -1,16 +1,15 @@
 package cn.lucasji.starry.idp.core.entity;
 
-import cn.lucas.starry.infrastructure.entity.BaseEntityAudit;
+import cn.lucasji.starry.idp.infrastructure.entity.BaseEntityAudit;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import java.io.Serial;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.io.Serial;
 
 /**
  * @author lucas
@@ -25,8 +24,7 @@ import java.io.Serial;
 @AllArgsConstructor
 public class Role extends BaseEntityAudit {
 
-  @Serial
-  private static final long serialVersionUID = 5788075670411718009L;
+  @Serial private static final long serialVersionUID = 5788075670411718009L;
 
   @NotEmpty(message = "角色名称不能为空")
   private String name;

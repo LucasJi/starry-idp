@@ -16,6 +16,18 @@
   </properties>
 
   <dependencies>
+    <!-- spring web -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- openfeign -->
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+    </dependency>
+
     <!-- lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>

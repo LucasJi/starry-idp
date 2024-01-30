@@ -1,6 +1,6 @@
 package cn.lucasji.starry.idp.core.entity;
 
-import cn.lucas.starry.infrastructure.entity.BaseEntityAudit;
+import cn.lucasji.starry.idp.infrastructure.entity.BaseEntityAudit;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +9,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,10 +20,6 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.io.Serial;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * @author lucas
@@ -36,8 +35,7 @@ import java.util.Collection;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends BaseEntityAudit implements UserDetails, CredentialsContainer {
 
-  @Serial
-  private static final long serialVersionUID = -1239608698592368223L;
+  @Serial private static final long serialVersionUID = -1239608698592368223L;
 
   @NotEmpty(message = "用户名不能为空")
   @Column(name = "username")

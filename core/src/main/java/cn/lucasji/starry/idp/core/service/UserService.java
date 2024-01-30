@@ -1,10 +1,15 @@
 package cn.lucasji.starry.idp.core.service;
 
-import cn.lucas.starry.infrastructure.entity.BaseEntity;
-import cn.lucas.starry.infrastructure.modal.Result;
 import cn.lucasji.starry.idp.core.entity.User;
 import cn.lucasji.starry.idp.core.repository.UserRepository;
+import cn.lucasji.starry.idp.infrastructure.dto.UserDto;
+import cn.lucasji.starry.idp.infrastructure.modal.Result;
 import jakarta.persistence.EntityManager;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,12 +21,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author lucas
@@ -41,9 +40,9 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
   @Override
   public User loadUserByUsername(String username) {
     return userRepository
-      .findByUsername(username)
-      .orElseThrow(
-        () -> new UsernameNotFoundException("user with name '" + username + "' not found"));
+        .findByUsername(username)
+        .orElseThrow(
+            () -> new UsernameNotFoundException("user with name '" + username + "' not found"));
   }
 
   @Override
@@ -53,60 +52,83 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
     return loadUserByUsername(user.getUsername());
   }
 
-  public User findById(Long id) {
-    return userRepository
-      .findById(id)
-      .orElseThrow(() -> new NoSuchElementException("Could not find user with id " + id));
+  public UserDto findById(Long id) {
+    User user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new NoSuchElementException("Could not find user with id " + id));
+    return UserDto.builder()
+        .creationTimestamp(user.getCreationTimestamp())
+        .id(user.getId())
+        .email(user.getEmail())
+        .username(user.getUsername())
+        .build();
   }
 
-  public Map<Long, User> findIdUserMapByIds(List<Long> ids) {
+  public Map<Long, UserDto> findIdUserMapByIds(List<Long> ids) {
     List<User> users = userRepository.findAllByIdIn(ids);
-    return users.stream().collect(Collectors.toMap(BaseEntity::getId, user -> user));
+    return users.stream()
+        .map(
+            user ->
+                UserDto.builder()
+                    .creationTimestamp(user.getCreationTimestamp())
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .username(user.getUsername())
+                    .build())
+        .collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
   }
 
-  public Page<User> findPageByUserIdIn(List<Long> userIds, Pageable pageable) {
+  public Page<UserDto> findPageByUserIdIn(List<Long> userIds, Pageable pageable) {
     Page<User> userPage = userRepository.findAllByIdIn(userIds, pageable);
     log.info("users: {}", userPage.getContent());
-    return userPage;
+    return userPage.map(
+        user ->
+            UserDto.builder()
+                .creationTimestamp(user.getCreationTimestamp())
+                .id(user.getId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .build());
   }
 
-  public Result<User> add(User user) {
-    log.info("新增用户:{}", user);
+  public Result<UserDto> add(UserDto userDto) {
+    log.info("新增用户:{}", userDto);
 
-    if (userRepository.existsByEmail(user.getEmail())) {
+    if (userRepository.existsByEmail(userDto.getEmail())) {
       return Result.error("用户邮箱已存在");
     }
 
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-    User added = userRepository.save(user);
+    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+    UserDto added = userRepository.save(userDto);
     return Result.success(added);
   }
 
-  public Result<String> edit(User user) {
-    log.info("更新用户:{}", user);
-    User originalUser = findById(user.getId());
+  public Result<String> edit(UserDto userDto) {
+    log.info("更新用户:{}", userDto);
+    UserDto originalUserDto = findById(userDto.getId());
 
-    if (!Objects.equals(user.getEmail(), originalUser.getEmail())) {
-      log.info("用户邮箱更改:{}->{}", originalUser.getEmail(), user.getEmail());
+    if (!Objects.equals(userDto.getEmail(), originalUserDto.getEmail())) {
+      log.info("用户邮箱更改:{}->{}", originalUserDto.getEmail(), userDto.getEmail());
 
-      if (userRepository.existsByEmail(user.getEmail())) {
+      if (userRepository.existsByEmail(userDto.getEmail())) {
         return Result.error("用户邮箱已存在");
       }
 
-      originalUser.setEmail(user.getEmail());
+      originalUserDto.setEmail(userDto.getEmail());
     }
 
-    if (!Objects.equals(originalUser.getUsername(), user.getUsername())) {
-      log.info("用户姓名更改:{}->{}", originalUser.getUsername(), user.getUsername());
-      originalUser.setUsername(user.getUsername());
+    if (!Objects.equals(originalUserDto.getUsername(), userDto.getUsername())) {
+      log.info("用户姓名更改:{}->{}", originalUserDto.getUsername(), userDto.getUsername());
+      originalUserDto.setUsername(userDto.getUsername());
     }
 
-    if (StringUtils.isNotBlank(user.getPassword())) {
+    if (StringUtils.isNotBlank(userDto.getPassword())) {
       log.info("用户密码更新");
-      originalUser.setPassword(passwordEncoder.encode(user.getPassword()));
+      originalUserDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
     }
 
-    userRepository.save(originalUser);
+    userRepository.save(originalUserDto);
 
     return Result.success();
   }

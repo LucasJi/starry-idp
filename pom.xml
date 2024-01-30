@@ -42,7 +42,7 @@
       </dependency>
 
       <dependency>
-        <groupId>cn.lucas.starry</groupId>
+        <groupId>cn.lucasji.starry</groupId>
         <artifactId>infrastructure</artifactId>
         <version>${starry.infrastructure.version}</version>
       </dependency>
