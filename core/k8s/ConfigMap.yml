@@ -34,7 +34,7 @@ data:
           exposure:
             include: '*'
     idp:
-      issuer: http://www.lucasji.cn/idp
+      issuer: http://idp.lucasji.cn
       login-url: http://localhost:3000/auth/signin
       registered-client:
         starry-edu:
