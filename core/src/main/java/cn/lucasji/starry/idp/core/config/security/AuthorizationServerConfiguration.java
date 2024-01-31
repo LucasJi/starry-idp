@@ -148,7 +148,7 @@ public class AuthorizationServerConfiguration {
                     .requestMatchers("/actuator/**", "/actuator")
                     .permitAll()
                     .anyRequest()
-                    .authenticated())
+                    .permitAll())
         // 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
         .oauth2ResourceServer(
             configurer ->

@@ -1,6 +1,6 @@
 package cn.lucasji.starry.idp.core.config.redis;
 
-import cn.lucas.starry.infrastructure.util.JsonUtils;
+import cn.lucasji.starry.idp.infrastructure.util.JsonUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -27,7 +27,7 @@ public class RedisConfig {
     StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
     // 存入redis时序列化值的序列化器
     Jackson2JsonRedisSerializer<Object> valueSerializer =
-      new Jackson2JsonRedisSerializer<>(JsonUtils.MAPPER, Object.class);
+        new Jackson2JsonRedisSerializer<>(JsonUtils.MAPPER, Object.class);
 
     RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
 

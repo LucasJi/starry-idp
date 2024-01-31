@@ -1,6 +1,8 @@
 package cn.lucasji.starry.idp.core.controller;
 
 import cn.lucasji.starry.idp.core.service.UserService;
+import cn.lucasji.starry.idp.infrastructure.dto.AddUserDto;
+import cn.lucasji.starry.idp.infrastructure.dto.EditUserDto;
 import cn.lucasji.starry.idp.infrastructure.dto.UserDto;
 import cn.lucasji.starry.idp.infrastructure.modal.Result;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,13 +47,13 @@ public class UserController {
   }
 
   @PostMapping
-  public Result<UserDto> add(@RequestBody UserDto userDto) {
-    return userService.add(userDto);
+  public Result<String> add(@Validated @RequestBody AddUserDto addUserDto) {
+    return userService.add(addUserDto);
   }
 
   @PatchMapping
-  public Result<String> edit(@RequestBody UserDto userDto) {
-    return userService.edit(userDto);
+  public Result<String> edit(@Validated @RequestBody EditUserDto editUserDto) {
+    return userService.edit(editUserDto);
   }
 
   @DeleteMapping("/{id}")

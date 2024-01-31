@@ -1,6 +1,6 @@
 package cn.lucasji.starry.idp.core.support;
 
-import cn.lucas.starry.infrastructure.util.JsonUtils;
+import cn.lucasji.starry.idp.infrastructure.util.JsonUtils;
 import jakarta.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collection;

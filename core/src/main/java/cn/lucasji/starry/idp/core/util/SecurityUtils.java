@@ -1,9 +1,12 @@
 package cn.lucasji.starry.idp.core.util;
 
-import cn.lucas.starry.infrastructure.exception.UtilityInitializationException;
-import cn.lucas.starry.infrastructure.util.JsonUtils;
+import cn.lucasji.starry.idp.infrastructure.exception.UtilityInitializationException;
+import cn.lucasji.starry.idp.infrastructure.util.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,10 +23,6 @@ import org.springframework.security.oauth2.server.resource.authentication.Abstra
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author lucas
@@ -44,10 +43,10 @@ public final class SecurityUtils {
    * @return 客户端认证信息，获取失败抛出异常
    */
   public static OAuth2ClientAuthenticationToken getAuthenticatedClientElseThrowInvalidClient(
-    Authentication authentication) {
+      Authentication authentication) {
     OAuth2ClientAuthenticationToken clientPrincipal = null;
     if (OAuth2ClientAuthenticationToken.class.isAssignableFrom(
-      authentication.getPrincipal().getClass())) {
+        authentication.getPrincipal().getClass())) {
       clientPrincipal = (OAuth2ClientAuthenticationToken) authentication.getPrincipal();
     }
     if (clientPrincipal != null && clientPrincipal.isAuthenticated()) {
@@ -66,11 +65,11 @@ public final class SecurityUtils {
     Map<String, String[]> parameterMap = request.getParameterMap();
     MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>(parameterMap.size());
     parameterMap.forEach(
-      (key, values) -> {
-        for (String value : values) {
-          parameters.add(key, value);
-        }
-      });
+        (key, values) -> {
+          for (String value : values) {
+            parameters.add(key, value);
+          }
+        });
     return parameters;
   }
 
@@ -78,11 +77,10 @@ public final class SecurityUtils {
    * 抛出 OAuth2AuthenticationException 异常
    *
    * @param errorCode 错误码
-   * @param message   错误信息
-   * @param errorUri  错误对照地址
+   * @param message 错误信息
+   * @param errorUri 错误对照地址
    */
-  public static void throwError(
-    String errorCode, String message, String errorUri) {
+  public static void throwError(String errorCode, String message, String errorUri) {
     OAuth2Error error = new OAuth2Error(errorCode, message, errorUri);
     throw new OAuth2AuthenticationException(error);
   }
@@ -90,12 +88,12 @@ public final class SecurityUtils {
   /**
    * 认证与鉴权失败回调
    *
-   * @param request  当前请求
+   * @param request 当前请求
    * @param response 当前响应
-   * @param e        具体的异常信息
+   * @param e 具体的异常信息
    */
   public static void exceptionHandler(
-    HttpServletRequest request, HttpServletResponse response, Throwable e) {
+      HttpServletRequest request, HttpServletResponse response, Throwable e) {
     Map<String, String> parameters = getErrorParameter(request, response, e);
     String wwwAuthenticate = computeWwwAuthenticateHeaderValue(parameters);
     response.addHeader(HttpHeaders.WWW_AUTHENTICATE, wwwAuthenticate);
@@ -111,20 +109,20 @@ public final class SecurityUtils {
   /**
    * 获取异常信息map
    *
-   * @param request  当前请求
+   * @param request 当前请求
    * @param response 当前响应
-   * @param e        本次异常具体的异常实例
+   * @param e 本次异常具体的异常实例
    * @return 异常信息map
    */
   private static Map<String, String> getErrorParameter(
-    HttpServletRequest request, HttpServletResponse response, Throwable e) {
+      HttpServletRequest request, HttpServletResponse response, Throwable e) {
     Map<String, String> parameters = new LinkedHashMap<>();
     if (request.getUserPrincipal() instanceof AbstractOAuth2TokenAuthenticationToken) {
       // 权限不足
       parameters.put("error", BearerTokenErrorCodes.INSUFFICIENT_SCOPE);
       parameters.put(
-        "error_description",
-        "The request requires higher privileges than provided by the access token.");
+          "error_description",
+          "The request requires higher privileges than provided by the access token.");
       parameters.put("error_uri", "https://tools.ietf.org/html/rfc6750#section-3.1");
       response.setStatus(HttpStatus.FORBIDDEN.value());
     }

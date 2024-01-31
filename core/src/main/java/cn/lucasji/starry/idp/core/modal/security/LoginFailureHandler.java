@@ -1,7 +1,7 @@
 package cn.lucasji.starry.idp.core.modal.security;
 
-import cn.lucas.starry.infrastructure.modal.Result;
-import cn.lucas.starry.infrastructure.util.JsonUtils;
+import cn.lucasji.starry.idp.infrastructure.modal.Result;
+import cn.lucasji.starry.idp.infrastructure.util.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

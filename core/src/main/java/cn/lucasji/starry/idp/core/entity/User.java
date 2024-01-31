@@ -2,13 +2,13 @@ package cn.lucasji.starry.idp.core.entity;
 
 import cn.lucasji.starry.idp.infrastructure.entity.BaseEntityAudit;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,11 +37,9 @@ public class User extends BaseEntityAudit implements UserDetails, CredentialsCon
 
   @Serial private static final long serialVersionUID = -1239608698592368223L;
 
-  @NotEmpty(message = "用户名不能为空")
   @Column(name = "username")
   private String username;
 
-  @Email(message = "邮箱格式不正确")
   @Column(name = "email")
   private String email;
 
@@ -50,8 +48,7 @@ public class User extends BaseEntityAudit implements UserDetails, CredentialsCon
    *
    * <p>上述规则的建立是为了确保密码不会随便泄露出去
    */
-  // TODO: feign调用user相关接口时, 该注解会影响序列化. 为了方便起见, 接口的入参回参直接接收实体类型, 后续如果改为DTO类型可以放开此注释
-  // @JsonProperty(access = Access.WRITE_ONLY)
+  @JsonProperty(access = Access.WRITE_ONLY)
   @Column(updatable = false)
   private String password;
 

@@ -1,7 +1,11 @@
 package cn.lucasji.starry.idp.core.service;
 
+import cn.lucasji.starry.idp.core.entity.Role;
 import cn.lucasji.starry.idp.core.entity.User;
+import cn.lucasji.starry.idp.core.mapper.UserMapper;
 import cn.lucasji.starry.idp.core.repository.UserRepository;
+import cn.lucasji.starry.idp.infrastructure.dto.AddUserDto;
+import cn.lucasji.starry.idp.infrastructure.dto.EditUserDto;
 import cn.lucasji.starry.idp.infrastructure.dto.UserDto;
 import cn.lucasji.starry.idp.infrastructure.modal.Result;
 import jakarta.persistence.EntityManager;
@@ -12,7 +16,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author lucas
@@ -36,6 +40,8 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
   private final PasswordEncoder passwordEncoder;
 
   private final EntityManager entityManager;
+
+  private final UserMapper userMapper;
 
   @Override
   public User loadUserByUsername(String username) {
@@ -53,82 +59,66 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
   }
 
   public UserDto findById(Long id) {
-    User user =
-        userRepository
-            .findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Could not find user with id " + id));
-    return UserDto.builder()
-        .creationTimestamp(user.getCreationTimestamp())
-        .id(user.getId())
-        .email(user.getEmail())
-        .username(user.getUsername())
-        .build();
+    User user = findByIdOrElseThrow(id);
+    return userMapper.convertToUserDto(user);
+  }
+
+  private User findByIdOrElseThrow(Long id) {
+    return userRepository
+        .findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Could not find user with id " + id));
   }
 
   public Map<Long, UserDto> findIdUserMapByIds(List<Long> ids) {
     List<User> users = userRepository.findAllByIdIn(ids);
     return users.stream()
-        .map(
-            user ->
-                UserDto.builder()
-                    .creationTimestamp(user.getCreationTimestamp())
-                    .id(user.getId())
-                    .email(user.getEmail())
-                    .username(user.getUsername())
-                    .build())
+        .map(userMapper::convertToUserDto)
         .collect(Collectors.toMap(UserDto::getId, userDto -> userDto));
   }
 
   public Page<UserDto> findPageByUserIdIn(List<Long> userIds, Pageable pageable) {
     Page<User> userPage = userRepository.findAllByIdIn(userIds, pageable);
     log.info("users: {}", userPage.getContent());
-    return userPage.map(
-        user ->
-            UserDto.builder()
-                .creationTimestamp(user.getCreationTimestamp())
-                .id(user.getId())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .build());
+    return userPage.map(userMapper::convertToUserDto);
   }
 
-  public Result<UserDto> add(UserDto userDto) {
-    log.info("新增用户:{}", userDto);
+  @Transactional(rollbackFor = Exception.class)
+  public Result<String> add(AddUserDto addUserDto) {
+    log.info("新增用户:{}", addUserDto);
 
-    if (userRepository.existsByEmail(userDto.getEmail())) {
+    if (userRepository.existsByEmail(addUserDto.getEmail())) {
       return Result.error("用户邮箱已存在");
     }
 
-    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-    UserDto added = userRepository.save(userDto);
-    return Result.success(added);
+    User user = userMapper.convertedFrom(addUserDto);
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    // Role: member
+    user.setRole(Role.builder().id(2L).build());
+    userRepository.save(user);
+
+    return Result.success();
   }
 
-  public Result<String> edit(UserDto userDto) {
-    log.info("更新用户:{}", userDto);
-    UserDto originalUserDto = findById(userDto.getId());
+  public Result<String> edit(EditUserDto editUserDto) {
+    log.info("更新用户:{}", editUserDto);
+    User userFromDatasource = findByIdOrElseThrow(editUserDto.getId());
 
-    if (!Objects.equals(userDto.getEmail(), originalUserDto.getEmail())) {
-      log.info("用户邮箱更改:{}->{}", originalUserDto.getEmail(), userDto.getEmail());
+    if (!Objects.equals(editUserDto.getEmail(), userFromDatasource.getEmail())) {
+      log.info("用户邮箱更改:{}->{}", userFromDatasource.getEmail(), editUserDto.getEmail());
 
-      if (userRepository.existsByEmail(userDto.getEmail())) {
+      if (userRepository.existsByEmail(userFromDatasource.getEmail())) {
         return Result.error("用户邮箱已存在");
       }
 
-      originalUserDto.setEmail(userDto.getEmail());
+      userFromDatasource.setEmail(editUserDto.getEmail());
     }
 
-    if (!Objects.equals(originalUserDto.getUsername(), userDto.getUsername())) {
-      log.info("用户姓名更改:{}->{}", originalUserDto.getUsername(), userDto.getUsername());
-      originalUserDto.setUsername(userDto.getUsername());
+    if (!Objects.equals(editUserDto.getUsername(), userFromDatasource.getUsername())) {
+      log.info("用户姓名更改:{}->{}", userFromDatasource.getUsername(), editUserDto.getUsername());
+      userFromDatasource.setUsername(editUserDto.getUsername());
     }
 
-    if (StringUtils.isNotBlank(userDto.getPassword())) {
-      log.info("用户密码更新");
-      originalUserDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-    }
-
-    userRepository.save(originalUserDto);
+    userRepository.save(userFromDatasource);
 
     return Result.success();
   }
