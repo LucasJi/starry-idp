@@ -1,4 +1,4 @@
-package cn.lucasji.starry.idp.infrastructure.dto;
+package cn.lucasji.starry.idp.infrastructure.dto.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

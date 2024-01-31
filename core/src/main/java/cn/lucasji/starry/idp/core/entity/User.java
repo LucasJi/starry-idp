@@ -9,9 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.io.Serial;
-import java.util.ArrayList;
-import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,6 +17,10 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author lucas
@@ -35,7 +36,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends BaseEntityAudit implements UserDetails, CredentialsContainer {
 
-  @Serial private static final long serialVersionUID = -1239608698592368223L;
+  @Serial
+  private static final long serialVersionUID = -1239608698592368223L;
 
   @Column(name = "username")
   private String username;

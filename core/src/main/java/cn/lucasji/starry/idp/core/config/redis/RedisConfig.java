@@ -27,7 +27,7 @@ public class RedisConfig {
     StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
     // 存入redis时序列化值的序列化器
     Jackson2JsonRedisSerializer<Object> valueSerializer =
-        new Jackson2JsonRedisSerializer<>(JsonUtils.MAPPER, Object.class);
+      new Jackson2JsonRedisSerializer<>(JsonUtils.MAPPER, Object.class);
 
     RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
 

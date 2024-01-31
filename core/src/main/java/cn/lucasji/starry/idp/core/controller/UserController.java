@@ -1,12 +1,11 @@
 package cn.lucasji.starry.idp.core.controller;
 
 import cn.lucasji.starry.idp.core.service.UserService;
-import cn.lucasji.starry.idp.infrastructure.dto.AddUserDto;
-import cn.lucasji.starry.idp.infrastructure.dto.EditUserDto;
 import cn.lucasji.starry.idp.infrastructure.dto.UserDto;
+import cn.lucasji.starry.idp.infrastructure.dto.req.AddUserReq;
+import cn.lucasji.starry.idp.infrastructure.dto.req.EditUserReq;
+import cn.lucasji.starry.idp.infrastructure.dto.req.FindUserPageReq;
 import cn.lucasji.starry.idp.infrastructure.modal.Result;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lucas
@@ -41,19 +43,19 @@ public class UserController {
     return userService.findIdUserMapByIds(ids);
   }
 
-  @PostMapping("/findPageByUserIdIn")
-  public Page<UserDto> findPageByUserIdIn(@RequestBody List<Long> userIds, Pageable pageable) {
-    return userService.findPageByUserIdIn(userIds, pageable);
+  @PostMapping("/findPage")
+  public Page<UserDto> findPage(@RequestBody FindUserPageReq body, Pageable pageable) {
+    return userService.findPage(body, pageable);
   }
 
   @PostMapping
-  public Result<String> add(@Validated @RequestBody AddUserDto addUserDto) {
-    return userService.add(addUserDto);
+  public Result<Long> add(@Validated @RequestBody AddUserReq addUserReq) {
+    return userService.add(addUserReq);
   }
 
   @PatchMapping
-  public Result<String> edit(@Validated @RequestBody EditUserDto editUserDto) {
-    return userService.edit(editUserDto);
+  public Result<String> edit(@Validated @RequestBody EditUserReq editUserReq) {
+    return userService.edit(editUserReq);
   }
 
   @DeleteMapping("/{id}")
