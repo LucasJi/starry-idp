@@ -53,13 +53,8 @@ public class LoginTargetAuthenticationEntryPoint extends LoginUrlAuthenticationE
     // 绝对路径在重定向前添加target参数
     String targetParameter = URLEncoder.encode(requestUrl.toString(), StandardCharsets.UTF_8);
     String targetUrl =
-      loginForm
-        + "?target="
-        + targetParameter
-        + "&"
-        + SecurityConstants.NONCE_HEADER_NAME
-        + "="
-        + request.getSession(Boolean.FALSE).getId();
+      STR."\{loginForm}?target=\{targetParameter}&\{SecurityConstants.NONCE_HEADER_NAME}=\{request.getSession(
+        Boolean.FALSE).getId()}";
     log.info("重定向至前后端分离的登录页面, targetUrl:{}, targetParameter:{}", targetUrl,
       targetParameter);
     redirectStrategy.sendRedirect(request, response, targetUrl);
