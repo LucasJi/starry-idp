@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author jiwh
+ * @author Lucas Ji
  * @date 2024/1/30 13:27
  */
 @FeignClient(name = "idp", url = "${idp.url}", path = "/user")

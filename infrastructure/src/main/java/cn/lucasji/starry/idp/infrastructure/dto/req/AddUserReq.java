@@ -2,20 +2,18 @@ package cn.lucasji.starry.idp.infrastructure.dto.req;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Data;
 
 /**
- * @author jiwh
+ * @author Lucas Ji
  * @date 2024/1/31 9:35
  */
 @Data
 public class AddUserReq implements Serializable {
 
-  @Serial
-  private static final long serialVersionUID = 759718627835795470L;
+  @Serial private static final long serialVersionUID = 759718627835795470L;
 
   @NotEmpty(message = "邮箱不能为空")
   @Email(message = "邮箱格式不正确")
