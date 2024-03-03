@@ -1,13 +1,13 @@
 package cn.lucasji.starry.idp.core.repository;
 
+import cn.lucasji.starry.idp.core.entity.Role;
 import cn.lucasji.starry.idp.core.entity.User;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author lucas
@@ -30,4 +30,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Long> ids, String usernameLike, String emailLike, Pageable pageable);
 
   boolean existsByEmail(String email);
+
+  long countByRole(Role role);
 }

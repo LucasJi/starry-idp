@@ -10,6 +10,11 @@ import cn.lucasji.starry.idp.infrastructure.dto.req.EditUserReq;
 import cn.lucasji.starry.idp.infrastructure.dto.req.FindUserPageReq;
 import cn.lucasji.starry.idp.infrastructure.modal.Result;
 import jakarta.persistence.EntityManager;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,12 +26,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author lucas
@@ -79,8 +78,9 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
   }
 
   public Page<UserDto> findPage(FindUserPageReq body, Pageable pageable) {
-    Page<User> userPage = userRepository.findAllByIdInAndUsernameLikeIgnoreCaseAndEmailLikeIgnoreCase(
-      body.getIds(), STR."%\{body.getUsername()}%", STR."%\{body.getEmail()}%", pageable);
+    Page<User> userPage =
+      userRepository.findAllByIdInAndUsernameLikeIgnoreCaseAndEmailLikeIgnoreCase(
+        body.getIds(), STR."%\{body.getUsername()}%", STR."%\{body.getEmail()}%", pageable);
     log.info("users: {}", userPage.getContent());
     return userPage.map(userMapper::convertToUserDto);
   }
@@ -129,5 +129,10 @@ public class UserService implements UserDetailsService, UserDetailsPasswordServi
   public Result<String> delete(Long userId) {
     userRepository.deleteById(userId);
     return Result.success();
+  }
+
+  public Result<Long> getAdminCount() {
+    long adminCount = userRepository.countByRole(Role.builder().id(1L).build());
+    return Result.success(adminCount);
   }
 }
