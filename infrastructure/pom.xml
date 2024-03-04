@@ -6,7 +6,7 @@
   <parent>
     <groupId>cn.lucasji.starry</groupId>
     <artifactId>idp</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1.RELEASE</version>
   </parent>
 
   <artifactId>infrastructure</artifactId>
@@ -20,7 +20,7 @@
       <groupId>io.github.openfeign</groupId>
       <artifactId>feign-okhttp</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
