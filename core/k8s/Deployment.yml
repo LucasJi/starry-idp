@@ -17,6 +17,7 @@ spec:
       containers:
         - name: starry-idp
           image: registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp:latest
+          imagePullPolicy: Always
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: prod
