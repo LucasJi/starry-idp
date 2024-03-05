@@ -34,12 +34,12 @@ data:
           exposure:
             include: '*'
     idp:
-      issuer: http://idp.lucasji.cn
-      login-url: http://localhost:3000/auth/signin
+      issuer: http://api.lucasji.cn/idp
+      login-url: http://edu.lucasji.cn/auth/signin
       registered-client:
         starry-edu:
-          redirect-url: http://localhost:3000/api/auth/callback/starry
+          redirect-url: http://edu.lucasji.cn/api/auth/callback/starry
           client-secret: $2a$10$.B57Cqa6gIszwQx.oRY5medUUOCJGNupi6z3DbFrfMYZ4bjhCKWcS
     logging:
       level:
-        org.springframework.security: trace
+        org.springframework.security: info

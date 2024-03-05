@@ -8,8 +8,10 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: "Host(`idp.lucasji.cn`)"
+      match: "Host(`api.lucasji.cn`) && PathPrefix(`/idp`)"
       services:
         - kind: Service
           name: starry-idp-svc
           port: 8000
+      middlewares:
+        - name: idp-ingress-middleware
