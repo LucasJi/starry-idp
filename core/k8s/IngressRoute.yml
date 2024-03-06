@@ -11,5 +11,5 @@ spec:
       match: "Host(`api.idp.lucasji.cn`)"
       services:
         - kind: Service
-          name: starry-idp-svc
+          name: starry-idp-backend-svc
           port: 8000

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: starry-idp-svc
+  name: starry-idp-backend-svc
 spec:
   type: ClusterIP
   ports:
@@ -9,4 +9,4 @@ spec:
       port: 8000
       targetPort: 8080
   selector:
-    app: starry-idp
+    app: starry-idp-backend

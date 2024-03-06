@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: starry-idp-deploy
+  name: starry-idp-backend-deploy
   labels:
-    app: starry-idp
+    app: starry-idp-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: starry-idp
+      app: starry-idp-backend
   template:
     metadata:
       labels:
-        app: starry-idp
+        app: starry-idp-backend
     spec:
       containers:
-        - name: starry-idp
+        - name: starry-idp-backend
           image: registry.cn-shanghai.aliyuncs.com/lucasji/starry-idp-backend:latest
           imagePullPolicy: Always
           env:
@@ -35,11 +35,11 @@ spec:
                   key: password
           volumeMounts:
             - mountPath: /config
-              name: starry-idp-config
+              name: starry-idp-backend-config
           ports:
             - containerPort: 8080
               name: server
       volumes:
-        - name: starry-idp-config
+        - name: starry-idp-backend-config
           configMap:
-            name: starry-idp-config
+            name: starry-idp-backend-config
