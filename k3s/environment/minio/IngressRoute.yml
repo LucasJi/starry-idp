@@ -1,0 +1,21 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: minio-ingress-route
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: "Host(`minio.idp.lucasji.cn`)"
+      services:
+        - kind: Service
+          name: minio-svc
+          port: 9202
+    - kind: Rule
+      match: "Host(`minio.lucasji.cn`)"
+      services:
+        - kind: Service
+          name: minio-svc
+          port: 9201

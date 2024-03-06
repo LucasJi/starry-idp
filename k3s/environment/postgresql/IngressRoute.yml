@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: postgresql-ingress-route
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: "Host(`postgresql.lucasji.cn`)"
+      services:
+        - kind: Service
+          name: postgres
+          port: 5432

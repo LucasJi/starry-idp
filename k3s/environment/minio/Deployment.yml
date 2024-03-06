@@ -36,20 +36,8 @@ spec:
                 secretKeyRef:
                   name: minio-secret
                   key: password
-            - name: MINIO_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: minio-secret
-                  key: accessKey
-            - name: MINIO_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: minio-secret
-                  key: secretKey
             - name: MINIO_BROWSER_REDIRECT_URL
-              value: http://49.234.53.94:30201
-            - name: MINIO_SERVER_URL
-              value: http://49.234.53.94:30202
+              value: http://minio.lucasji.cn
           ports:
             - containerPort: 9202
             - containerPort: 9201

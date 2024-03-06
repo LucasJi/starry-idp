@@ -27,9 +27,6 @@ spec:
                 secretKeyRef:
                   name: db-secret
                   key: password
-          envFrom:
-            - configMapRef:
-                name: postgres-config
           ports:
             - containerPort: 5432
               name: postgres
