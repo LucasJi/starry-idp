@@ -42,4 +42,4 @@ data:
           client-secret: $2a$10$.B57Cqa6gIszwQx.oRY5medUUOCJGNupi6z3DbFrfMYZ4bjhCKWcS
     logging:
       level:
-        org.springframework.security: info
+        org.springframework.security: trace
