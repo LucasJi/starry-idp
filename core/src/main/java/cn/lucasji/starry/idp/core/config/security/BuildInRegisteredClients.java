@@ -50,7 +50,7 @@ public class BuildInRegisteredClients {
             // 客户端请求授权时是否添加“同意授权”选项
             .requireAuthorizationConsent(false)
             // 授权码授权流程中是否对密钥进行质询和验证
-            .requireProofKey(true)
+            .requireProofKey(false)
             .build())
         .build();
 
