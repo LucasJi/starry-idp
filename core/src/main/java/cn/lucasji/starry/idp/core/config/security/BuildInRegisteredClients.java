@@ -1,5 +1,9 @@
 package cn.lucasji.starry.idp.core.config.security;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -8,11 +12,6 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.stereotype.Component;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author lucas
@@ -51,7 +50,7 @@ public class BuildInRegisteredClients {
             // 客户端请求授权时是否添加“同意授权”选项
             .requireAuthorizationConsent(false)
             // 授权码授权流程中是否对密钥进行质询和验证
-            .requireProofKey(false)
+            .requireProofKey(true)
             .build())
         .build();
 
