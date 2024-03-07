@@ -145,3 +145,17 @@ databaseChangeLog:
                   type: bigint
             encoding: UTF-8
             file: db/data/administrator.csv
+  - changeSet:
+      id: 8
+      author: lucas
+      changes:
+        - loadData:
+            schemaName: public
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  header: name
+                  type: varchar(128)
+            encoding: UTF-8
+            file: db/data/member_role.csv
