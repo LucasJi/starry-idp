@@ -25,9 +25,10 @@ public class CommonCorsConfiguration {
     CorsConfiguration configuration = new CorsConfiguration();
 
     // 设置允许跨域的域名,如果允许携带cookie的话,路径就不能写*号, *表示所有的域名都可以跨域访问
-    configuration.addAllowedOrigin("*");
-    // 设置跨域访问可以携带cookie
-    configuration.setAllowCredentials(false);
+    // TODO 支持通过配置文件动态修改
+    configuration.addAllowedOrigin("http://edu.lucasji.cn");
+    // 设置跨域访问可以携带cookie，需要设置为 true 以满足 PKCE
+    configuration.setAllowCredentials(true);
     // 允许所有的请求方法 ==> GET POST PUT Delete
     configuration.addAllowedMethod("*");
     // 允许携带任何头信息
