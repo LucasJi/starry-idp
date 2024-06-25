@@ -12,7 +12,7 @@
   <groupId>cn.lucasji.starry</groupId>
   <artifactId>idp</artifactId>
   <version>0.0.1.RELEASE</version>
-  <name>STARRY</name>
+  <name>idp</name>
   <description>Starry IDP</description>
   <packaging>pom</packaging>
 
